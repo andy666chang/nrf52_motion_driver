@@ -36,7 +36,7 @@
 #include "inv_mpu_dmp_motion_driver.h"
 #include "dmpKey.h"
 #include "dmpmap.h"
-#define _MPL
+//#define _MPL
 #ifdef _MPL
 #include "invensense.h"
 #include "invensense_adv.h"
@@ -66,9 +66,9 @@ ret_code_t system_init(void);
 
 
 bool twi_write(unsigned char slave_addr, unsigned char reg_addr,
-     unsigned char length, unsigned char const *data);
+               unsigned char length, unsigned char const *data);
 bool twi_read(unsigned char slave_addr, unsigned char reg_addr,
-     unsigned char length, unsigned char *data);
+              unsigned char length, unsigned char *data);
 
 
 void mpu6050_init(void);
@@ -77,17 +77,17 @@ void read_from_mpl(void);
 
 static inline unsigned short inv_row_2_scale(const signed char *row);
 static inline unsigned short inv_orientation_matrix_to_scalar(
-    const signed char *mtx);
+     const signed char *mtx);
 
 
 struct mpu6050_data
 {
-		bool data_in ;
-		float accel[3] ;
-		float gyro[3] ;
-		float quat[4] ;
-		float linear_accel[3] ;
-		float gravity[3] ;
+	bool data_in ;
+	float accel[3] ;
+	float gyro[3] ;
+	float quat[4] ;
+	float linear_accel[3] ;
+	float gravity[3] ;
 };
 extern struct mpu6050_data mpu_data ;
 

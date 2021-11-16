@@ -56,35 +56,36 @@
  */
 int main(void)
 {
-		ret_code_t err_code;
-		//uint8_t buff[10] = {0} ;
+    ret_code_t err_code;
+    //uint8_t buff[10] = {0} ;
 
-		
-		err_code = system_init();
-		APP_ERROR_CHECK(err_code);
-	
-//		mpu6050_init();
-		mpu6050_MPL_init();
-	
-		mpu_reset_fifo();
-		nrf_drv_gpiote_in_event_enable( 28 , true );
-	
+
+    err_code = system_init();
+    APP_ERROR_CHECK(err_code);
+#ifndef  _MPL
+    mpu6050_init();
+#else
+    mpu6050_MPL_init();
+#endif
+    mpu_reset_fifo();
+    nrf_drv_gpiote_in_event_enable( 28 , true );
+
     while (true)
     {
         // Do nothing.
-				__WFE();
-				if( mpu_data.data_in )
-				{
-						mpu_data.data_in = false ;
-						
-//						NRF_LOG_INFO("accel= %d,%d,%d \r\n",mpu_data.accel[0],mpu_data.accel[1],mpu_data.accel[2]);
-//						NRF_LOG_FLUSH();
-//						NRF_LOG_INFO("gyro= %d,%d,%d \r\n",mpu_data.gyro[0],mpu_data.gyro[1],mpu_data.gyro[2]);
-//						NRF_LOG_FLUSH();
-					
-						read_from_mpl();
-						
-				}
+        __WFE();
+        if ( mpu_data.data_in )
+        {
+            mpu_data.data_in = false ;
+#ifndef  _MPL
+            NRF_LOG_INFO("accel= %d,%d,%d \r\n", mpu_data.accel[0], mpu_data.accel[1], mpu_data.accel[2]);
+            NRF_LOG_FLUSH();
+            NRF_LOG_INFO("gyro= %d,%d,%d \r\n", mpu_data.gyro[0], mpu_data.gyro[1], mpu_data.gyro[2]);
+            NRF_LOG_FLUSH();
+#else
+            read_from_mpl();
+#endif
+        }
     }
 }
 /** @} */
