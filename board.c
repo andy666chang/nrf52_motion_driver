@@ -16,16 +16,17 @@ struct mpu6050_data mpu_data = {0};
 static void gpiote_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     nrf_delay_us(10);
-    if ( pin == 28 )
+    if ( pin == 13 )
     {
         nrf_gpio_pin_toggle(16);
 //              NRF_LOG_INFO("gyro data in\r\n");
 //              NRF_LOG_FLUSH();
 
         unsigned long sensor_timestamp;
-        short gyro[3], accel[3], sensors;
+        short gyro[3], accel[3] ={0};
         long l_accel[3];
-        unsigned char more;
+        unsigned char more=0;
+		short sensors = INV_XYZ_GYRO|INV_XYZ_ACCEL ;
         long quat[4], temperature;
 
         mpu_data.data_in = true ;
@@ -33,8 +34,10 @@ static void gpiote_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
         dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more);
         inv_build_quat(quat, 0, sensor_timestamp);
 #else
-        mpu_get_accel_reg(accel, &sensor_timestamp);
-        mpu_get_gyro_reg(gyro, &sensor_timestamp);
+//        mpu_get_accel_reg(accel, &sensor_timestamp);
+//        mpu_get_gyro_reg(gyro, &sensor_timestamp);
+//		mpu_read_fifo( gyro, accel, &sensor_timestamp, &sensors, &more);
+		dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more);
 #endif
         if ( more )
         {
@@ -45,7 +48,7 @@ static void gpiote_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
         for ( uint8_t i = 0 ; i < 3 ; i++ )
         {
             mpu_data.accel[i] = accel[i] / 163.84 ;
-            mpu_data.gyro[i] = gyro[i] / 131.0 ;
+            mpu_data.gyro[i] = gyro[i] / 16.4 ;
 
             l_accel[i] = (long)accel[i];
         }
@@ -138,15 +141,15 @@ ret_code_t system_init(void)
 
     nrfx_gpiote_in_config_t gpiote_in_config = GPIOTE_CONFIG_IN_SENSE_LOTOHI(false);
     gpiote_in_config.pull = NRF_GPIO_PIN_PULLUP ;
-    err_code = nrf_drv_gpiote_in_init( 28 , &gpiote_in_config , gpiote_handler  );// 17 button , 28 mpu6050 INT pin
+    err_code = nrf_drv_gpiote_in_init( 13 , &gpiote_in_config , gpiote_handler  );// 17 button , 28 mpu6050 INT pin
     APP_ERROR_CHECK(err_code);
 
 //        nrf_drv_gpiote_in_event_enable( 28 , true );
 
     // twi
     nrf_drv_twi_config_t twi_config = {
-        .scl                = 30,
-        .sda                = 29,
+        .scl                = 22,
+        .sda                = 23,
         .frequency          = NRF_DRV_TWI_FREQ_400K,
         .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
         .clear_bus_init     = false
@@ -291,7 +294,7 @@ void mpu6050_init(void)
     * in inv_mpu.h.
     */
     int_param.cb = NULL;
-    int_param.pin = 28;
+    int_param.pin = 13;
     err_code = mpu_init(&int_param);
     APP_ERROR_CHECK(err_code);
 

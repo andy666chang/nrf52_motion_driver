@@ -68,7 +68,7 @@ int main(void)
     mpu6050_MPL_init();
 #endif
     mpu_reset_fifo();
-    nrf_drv_gpiote_in_event_enable( 28 , true );
+    nrf_drv_gpiote_in_event_enable( 13 , true );
 
     while (true)
     {
@@ -78,9 +78,9 @@ int main(void)
         {
             mpu_data.data_in = false ;
 #ifndef  _MPL
-            NRF_LOG_INFO("accel= %d,%d,%d \r\n", mpu_data.accel[0], mpu_data.accel[1], mpu_data.accel[2]);
+            NRF_LOG_INFO("accel= %d,%d,%d \r\n", (int16_t)mpu_data.accel[0], (int16_t)mpu_data.accel[1], (int16_t)mpu_data.accel[2]);
             NRF_LOG_FLUSH();
-            NRF_LOG_INFO("gyro= %d,%d,%d \r\n", mpu_data.gyro[0], mpu_data.gyro[1], mpu_data.gyro[2]);
+            NRF_LOG_INFO("gyro= %d,%d,%d \r\n", (int16_t)mpu_data.gyro[0], (int16_t)mpu_data.gyro[1], (int16_t)mpu_data.gyro[2]);
             NRF_LOG_FLUSH();
 #else
             read_from_mpl();
